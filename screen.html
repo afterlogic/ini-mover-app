@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Ini Mover</title>
+	
+	<link rel="stylesheet" href="./vendors/photon-master/dist/css/photon.css" type="text/css" />
+	
+	<script src="./node_modules/underscore/underscore-min.js"></script>
+	<script src="./node_modules/knockout/build/output/knockout-latest.debug.js"></script>
+	<script src="./node_modules/knockout-dragdrop/lib/knockout.dragdrop.js"></script>
+	<script src="./screen.js"></script>
+	<script src="./grid.js"></script>
+	<script src="./row.js"></script>
+	
+	<style>
+		table {
+			width: auto;
+		}
+		.table-striped {
+			table-layout: fixed;
+		}
+		.row-name {
+			max-width: 300px;
+		}
+		td.value {
+			max-width: 300px;
+		}
+		tr.selected {
+			background: #3e9bf4 !important;
+			color: #000 !important;
+		}
+		
+		tr.selected td,
+		tr.renaming td {
+			padding-top: 6px;
+			padding-bottom: 6px;
+		}
+		tr.selected td.row-name	{
+			color: #fff;
+		}
+		tr.dragging {
+			background: #a7d295 !important;
+		}
+		
+		tr.renaming {
+			background: #f5a7a7 !important;
+			color: #000 !important;
+		}
+	</style>
+</head>
+<body>
+	We are using node <script>document.write(process.versions.node)</script>,
+    Chrome <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.
+	
+	
+	<div id="app" class="window" style="width: 100%">
+		<header class="toolbar toolbar-header">
+			<h1 class="title">Ini mover</h1>
+			
+			<div class="toolbar-actions">
+				<div class="btn-group">
+					<button class="btn btn-default" data-bind="click: openProject">
+						<span class="icon icon-folder"></span>
+					</button>
+					<button class="btn btn-default" data-bind="click: saveProject">
+						<span class="icon icon-download"></span>
+					</button>
+				</div>
+				
+				<!-- ko if: oGrid -->
+				<div class="btn-group">
+					<button class="btn btn-default" data-bind="click: fillHoles">
+						<span class="icon icon-tools"></span>
+					</button>
+				</div>
+				
+				<div class="btn-group">
+					<button class="btn btn-default" data-bind="click: addRow">
+						<span class="icon icon-plus"></span>
+						Add
+					</button>
+					<button class="btn btn-default" data-bind="click: removeRow">
+						<span class="icon icon-minus"></span>
+						Remove
+					</button>
+				</div>
+				
+				<div class="btn-group">
+					<button class="btn btn-default" data-bind="click: addColumn">
+						<span class="icon icon-plus"></span>
+						Add Language
+					</button>
+					<button class="btn btn-default" data-bind="click: removeColumn">
+						<span class="icon icon-minus"></span>
+						Remove Language
+					</button>
+				</div>
+				<!-- /ko -->
+			</div>
+		</header>
+		<div class="window-content">
+			<!-- ko with: oGrid -->
+			<table class="table-striped sortable" data-bind="dropZone: {name: 'sortable', drop: function () {}}">
+				<tr>
+					<th></th>
+					<!-- ko foreach: headers -->
+					<th data-bind="text: $data"></th>
+					<!-- /ko -->
+				</tr>
+				
+				<!-- ko foreach: rows -->
+				<tr data-bind="click: toggleActive, css: {'selected': active, 'renaming': renaming, 'dragging': dragging},
+					   dragZone: {name: 'sortable', dragStart: $parent.dragStart, dragEnd: $parent.dragEnd, element: null},
+					   dragEvents: {accepts: 'sortable', dragOver: $parent.reorder, data: {items: $parent.rows, item: $data}}">
+					<td data-bind="click: toggleRenaming" class="row-name">
+						<span data-bind="text: name, visible: !renaming()"></span>
+						<input data-bind="value: name, visible: renaming" class="form-control" style="width: 100%;" />
+					</td>
+					
+					<!-- ko if: active -->
+						<!-- ko foreach: values -->
+						<td class="value">
+							<input data-bind="value: value" class="form-control" style="width: 100%;" />
+						</td>
+						<!-- /ko -->
+					<!-- /ko -->
+					<!-- ko if: !active() -->
+						<!-- ko foreach: values -->
+						<td class="value">
+							<span data-bind="text: value"></span>
+						</td>
+						<!-- /ko -->
+					<!-- /ko -->
+				</tr>
+				<!-- /ko -->
+			</table>
+			<!-- /ko -->
+		</div>
+		<footer class="toolbar toolbar-footer">
+		</footer>
+	</div>
+	
+	
+	<script>
+		'use strict';
+	
+		//const remote = require('electron').remote;
+		//const screenClass = remote.require('./screen-server.js');
+		//const oScreen = new screenClass('Vasil');
+		
+		
+		const EventEmitter = require('electron').ipcRenderer;
+			
+		//EventEmitter.send('request', {
+			//'test': 'object'
+		//});
+		
+		
+		
+		document.addEventListener("DOMContentLoaded", function () {
+			ko.applyBindings(new Screen(), document.getElementById('app'));
+		});
+	</script>
+</body>
+</html>

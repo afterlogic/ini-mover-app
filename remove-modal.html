@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Remove language</title>
+	<script src="./node_modules/knockout/build/output/knockout-latest.debug.js"></script>
+	<link rel="stylesheet" href="./vendors/photon-master/dist/css/photon.css" type="text/css" />
+</head>
+<body>
+	<div id="app" class="window" style="width: 100%">
+		<div class="window-content">
+			<form>
+				<div class="form-group">
+					<label>Select language to remove</label>
+					<select class="form-control" data-bind="foreach: list, value: language">
+						<option data-bind="text: $data"></option>
+					</select>
+				</div>
+			</form>
+		</div>
+		<footer class="toolbar toolbar-footer">
+		  <div class="toolbar-actions">
+			<button class="btn btn-primary pull-right" data-bind="click: remove">
+				Remove
+			</button>
+			<button class="btn btn-default pull-right" data-bind="click: cancel">
+				Cancel
+			</button>
+		  </div>
+		</footer>
+	</div>
+	
+	<script>
+		var 
+			oElectron = require('electron'),
+			oSharedObject = oElectron.remote.getGlobal('sharedObject');
+			oForm = {
+				'language': ko.observable(''),
+				'list': ko.observable(oSharedObject['languages_list']),
+				'remove': function () {
+					oSharedObject['remove_language'] = oForm.language();
+					window.close();
+				},
+				'cancel': function () {
+					oSharedObject['remove_language'] = '';
+					window.close();
+				}
+			}
+		;
+		
+		oSharedObject['remove_language'] = '';
+
+		document.addEventListener("DOMContentLoaded", function () {
+			ko.applyBindings(oForm, document.getElementById('app'));
+		});
+	</script>	
+</body>
+</html>

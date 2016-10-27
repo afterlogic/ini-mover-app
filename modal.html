@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Add new language</title>
+	<script src="./node_modules/knockout/build/output/knockout-latest.debug.js"></script>
+	<link rel="stylesheet" href="./vendors/photon-master/dist/css/photon.css" type="text/css" />
+</head>
+<body>
+	<div id="app" class="window" style="width: 100%">
+		<div class="window-content">
+			<form>
+				<div class="form-group">
+					<label>New language filename</label>
+					<input type="text" class="form-control" placeholder="Language" data-bind="value: language">
+				</div>
+				<div class="form-group">
+					<label>Source language data</label>
+					<select class="form-control" data-bind="foreach: list, value: sourceLanguage">
+						<option data-bind="text: $data"></option>
+					</select>
+				</div>
+			</form>
+		</div>
+		<footer class="toolbar toolbar-footer">
+		  <div class="toolbar-actions">
+			<button class="btn btn-primary pull-right" data-bind="click: create">
+				Create
+			</button>
+			<button class="btn btn-default pull-right" data-bind="click: cancel">
+				Cancel
+			</button>
+		  </div>
+		</footer>
+	</div>
+	
+	<script>
+		var 
+			oElectron = require('electron'),
+			oSharedObject = oElectron.remote.getGlobal('sharedObject');
+			oForm = {
+				'language': ko.observable(''),
+				'sourceLanguage': ko.observable(''),
+				'list': ko.observable(oSharedObject['languages_list']),
+				'create': function () {
+					oSharedObject['source_language'] = oForm.sourceLanguage();
+					oSharedObject['create_language'] = oForm.language();
+					window.close();
+				},
+				'cancel': function () {
+					oSharedObject['source_language'] = '';
+					oSharedObject['create_language'] = '';
+					window.close();
+				}
+			}
+		;
+		
+		oSharedObject['source_language'] = '';
+		oSharedObject['create_language'] = '';
+
+		document.addEventListener("DOMContentLoaded", function () {
+			ko.applyBindings(oForm, document.getElementById('app'));
+		});
+	</script>	
+</body>
+</html>
