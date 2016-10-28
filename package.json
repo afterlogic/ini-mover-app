@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",
-	"pack": "electron-packager ./ IniMover --platform=win32 --arch=x64 --version 1.4.4 --overwrite"
+	"pack": "electron-packager ./ IniMover --out=build --platform=win32 --arch=x64 --version 1.4.4 --overwrite"
 	
   },
   "repository": {
