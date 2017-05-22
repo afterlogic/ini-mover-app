@@ -38,7 +38,7 @@ function createWindow () {
 	mainWindow.loadURL('file://' + __dirname + '/screen.html');
 
 	// Open the DevTools.
-	// mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
  
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function() {
@@ -67,13 +67,14 @@ function getData (sDirPath) {
 	if (!_.isEmpty(aDir))
 	{
 		_.each(aDir, function (sFileName) {
-			
-			var oFile = readIniFile(sDirPath + '/' + sFileName);
-			
-			
-			if (oFile)
-			{
-				oFilesContent[sFileName] = oFile;
+			if(sFileName.indexOf('.ini') === sFileName.length - 4){
+				var oFile = readIniFile(sDirPath + '/' + sFileName);
+
+
+				if (oFile)
+				{
+					oFilesContent[sFileName] = oFile;
+				}
 			}
 		});
 	}
@@ -102,7 +103,6 @@ function getData (sDirPath) {
 
 function saveData (oData) {
 	var oFilesContent = {};
-	
 	if (!_.isEmpty(oData))
 	{
 		_.each(oData, function (oConstValues, sFullConstName) {
@@ -148,7 +148,6 @@ function saveData (oData) {
 			}));
 		});
 	}
-
 }
 
 function readIniFile (sPath) {
@@ -157,10 +156,10 @@ function readIniFile (sPath) {
 	
 	var raw = fs.readFileSync(sPath, 'utf-8');
 	config.options.lineEnding = config.detectLineEnding(raw);
- 
+
 	//decode to get a simple js object
 	var oFileContent = config.decode(raw);
-	
+
 	if (oFileContent)
 	{
 		return clearData(oFileContent);
@@ -177,10 +176,10 @@ function clearData (oFileContent) {
 		}
 		else
 		{
-			sItem = sItem.replace(/(:?\")(:?\s*)\;.*$/g, '');
-			
+			sItem = sItem.replace(/(:?\")(:?\s*)\;.*$/g, '').replace(/(?:\\([\"\\\?]))/g, '$1');
+
 			var bInQuotes = sItem.substr(0, 1) === '"';
-			
+
 			while(sItem.substr(0, 1) === '"' || sItem.substr(0, 1) === ' ')
 			{
 				sItem = sItem.substr(1);
@@ -233,23 +232,14 @@ EventEmitter.on('project-open', function(event, oRequest) {
 });
 
 EventEmitter.on('project-save', function(event, oRequest) {
-	
-	var
-		oResponse = {
-			'result': false,
-			'message': 'Error'
-		}
-	;
-	
 	oRequest = JSON.parse(oRequest);
-
 	if (oRequest['rows'] && saveData(oRequest['rows']))
 	{
-		oResponse['result'] = true;
-		oResponse['message'] = 'Saved';
+		oRequest['result'] = true;
+		oRequest['message'] = 'Saved';
 	}
 	
-	event.sender.send('project-save', oResponse);
+	event.sender.send('project-save', oRequest);
 });
 
 //Directory select dialog
