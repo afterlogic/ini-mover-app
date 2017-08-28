@@ -115,7 +115,7 @@ function saveData (oData) {
 			
 			_.each(oConstValues, function(sValue, sFileName) {
 				// sValue = '"' +JSON.stringify(sValue)+ '"';
-				sValue = JSON.stringify(sValue);
+				sValue = JSON.stringify(sValue).replace(/\\+(\\r|\\n|\\t)/g, '$1');
 				
 				if (!oFilesContent[sFileName])
 				{
@@ -176,18 +176,22 @@ function clearData (oFileContent) {
 		}
 		else
 		{
-			sItem = sItem.replace(/(:?\")(:?\s*)\;.*$/g, '').replace(/(?:\\([\"\\\?]))/g, '$1');
-
-			var bInQuotes = sItem.substr(0, 1) === '"';
-
 			while(sItem.substr(0, 1) === '"' || sItem.substr(0, 1) === ' ')
 			{
 				sItem = sItem.substr(1);
 			}
-			while (sItem.substr(-1, 1) === '"' || sItem.substr(-1, 1) === ' ')
+			while ((sItem.substr(-1, 1) === '"' && sItem.substr(-2, 1) !== '\\') || sItem.substr(-1, 1) === ' ')
 			{
 				sItem = sItem.substr(0, sItem.length - 1);
 			}
+
+			sItem = sItem.replace(/(?:\")(:?\s*)\;.*$/g, '');
+			// sItem = sItem.replace(/(?:\\(\"|\\|\?))/g, '$1');
+			//sItem = sItem.replace(/^"|"$/g, '');
+			sItem = sItem.replace(/(?:\\(\"|\\|\?))/g, '$1');
+
+			var bInQuotes = sItem.substr(0, 1) === '"';
+
 			return sItem;
 		}
 	});
