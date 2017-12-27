@@ -1,9 +1,9 @@
 'use strict';
 
 const electron = require('electron');
+const path = require('path');
 // Module to control application life.
 const app = electron.app;
-
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -16,9 +16,9 @@ global.sharedObject = {
 	'remove_language': ''
 }
 
-// require('electron-reload')('.', {
-	// electron: require('electron-prebuilt')
-// });
+require('electron-reload')(__dirname, {
+ electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+});
 
 const _ = require('underscore');
 const fs = require('fs');
@@ -38,7 +38,7 @@ function createWindow () {
 	mainWindow.loadURL('file://' + __dirname + '/screen.html');
 
 	// Open the DevTools.
-	// mainWindow.webContents.openDevTools();
+	mainWindow.webContents.openDevTools();
  
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function() {
@@ -231,8 +231,23 @@ const dialog = require('electron').dialog;
 
 EventEmitter.on('project-open', function(event, oRequest) {
 	
-	var oFilesData = getData(oRequest['folder']);
-	event.sender.send('project-open', JSON.stringify(oFilesData));
+	var 
+		aDir = fs.readdirSync(oRequest['folder'])
+	;
+	
+	event.sender.send('project-open', JSON.stringify(aDir));	
+});
+
+EventEmitter.on('i18n-open', function(event, oRequest) {
+	var 
+		oFilesData = null
+	;
+	if (fs.existsSync(oRequest['folder']))
+	{
+		oFilesData = getData(oRequest['folder'])
+		event.sender.send('i18n-open', JSON.stringify(oFilesData));
+	}
+	
 });
 
 EventEmitter.on('project-save', function(event, oRequest) {
@@ -249,7 +264,7 @@ EventEmitter.on('project-save', function(event, oRequest) {
 //Directory select dialog
 EventEmitter.on('open-file-dialog', function (event) {
 	dialog.showOpenDialog({
-		properties: ['openFile', 'openDirectory']
+		properties: ['openDirectory']
 	}, function (files) {
 		if (files) {
 			event.sender.send('selected-directory', files);

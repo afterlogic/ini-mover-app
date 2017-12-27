@@ -9,9 +9,11 @@
 	<script src="./node_modules/underscore/underscore-min.js"></script>
 	<script src="./node_modules/knockout/build/output/knockout-latest.debug.js"></script>
 	<script src="./node_modules/knockout-dragdrop/lib/knockout.dragdrop.js"></script>
+	<script src="./node_modules/jquery/dist/jquery.min.js"></script>
 	<script src="./screen.js"></script>
 	<script src="./grid.js"></script>
 	<script src="./row.js"></script>
+	<script src="./vendors/fixedTblHdrLftCol-master/jquery.fixedTblHdrLftCol-min.js"></script>
 	
 	<style>
 		table {
@@ -100,43 +102,65 @@
 				<!-- /ko -->
 			</div>
 		</header>
+		
 		<div class="window-content">
-			<!-- ko with: oGrid -->
-			<table class="table-striped sortable" data-bind="dropZone: {name: 'sortable', drop: function () {}}">
-				<tr>
-					<th></th>
-					<!-- ko foreach: headers -->
-					<th data-bind="text: $data"></th>
-					<!-- /ko -->
-				</tr>
-				
-				<!-- ko foreach: rows -->
-				<tr data-bind="click: toggleActive, css: {'selected': active, 'renaming': renaming, 'dragging': dragging},
-					   dragZone: {name: 'sortable', dragStart: $parent.dragStart, dragEnd: $parent.dragEnd, element: null},
-					   dragEvents: {accepts: 'sortable', dragOver: $parent.reorder, data: {items: $parent.rows, item: $data}}">
-					<td data-bind="click: toggleRenaming" class="row-name">
-						<span data-bind="text: name, visible: !renaming()"></span>
-						<input data-bind="value: name, visible: renaming" class="form-control" style="width: 100%;" />
-					</td>
-					
-					<!-- ko if: active -->
-						<!-- ko foreach: values -->
-						<td class="value">
-							<input data-bind="value: value" class="form-control" style="width: 100%;" />
-						</td>
+			<div style="overflow: auto;">
+				<table class="table-striped sortable">
+					<thead>
+						<tr>
+							<th>Modules</th>
+						</tr>
+					</thead>					
+					<tbody>
+						<!-- ko foreach: modules -->
+						<tr data-bind="css: {'selected': $parent.isCurrentModule($data)}">
+							<td data-bind="text: $data, click: function(){$parent.getI18N($data);}"></td>
+						</tr>
 						<!-- /ko -->
-					<!-- /ko -->
-					<!-- ko if: !active() -->
-						<!-- ko foreach: values -->
-						<td class="value">
-							<span data-bind="text: value"></span>
-						</td>
+					</tbody>
+				</table>
+			</div>
+			<div class="window-content">
+				<!-- ko with: oGrid -->
+				<table class="table-striped sortable" id="dataTbl" data-bind="dropZone: {name: 'sortable', drop: function () {}}">
+					<thead>
+						<tr>
+							<th></th>
+							<!-- ko foreach: headers -->
+							<th data-bind="text: $data"></th>
+							<!-- /ko -->
+						</tr>
+					</thead>					
+					<tbody>
+						<!-- ko foreach: rows -->
+						<tr data-bind="click: toggleActive, css: {'selected': active, 'renaming': renaming, 'dragging': dragging},
+							   dragZone: {name: 'sortable', dragStart: $parent.dragStart, dragEnd: $parent.dragEnd, element: null},
+							   dragEvents: {accepts: 'sortable', dragOver: $parent.reorder, data: {items: $parent.rows, item: $data}}">
+							<td data-bind="click: toggleRenaming" class="row-name">
+								<span data-bind="text: name, visible: !renaming()"></span>
+								<input data-bind="value: name, visible: renaming" class="form-control" style="width: 100%;" />
+							</td>
+							
+							<!-- ko if: active -->
+								<!-- ko foreach: values -->
+								<td class="value">
+									<input data-bind="value: value" class="form-control" style="width: 100%;" />
+								</td>
+								<!-- /ko -->
+							<!-- /ko -->
+							<!-- ko if: !active() -->
+								<!-- ko foreach: values -->
+								<td class="value">
+									<span data-bind="text: value"></span>
+								</td>
+								<!-- /ko -->
+							<!-- /ko -->
+						</tr>
 						<!-- /ko -->
-					<!-- /ko -->
-				</tr>
+					</tbody>
+				</table>
 				<!-- /ko -->
-			</table>
-			<!-- /ko -->
+			</div>
 		</div>
 		<footer class="toolbar toolbar-footer">
 		</footer>
@@ -156,8 +180,6 @@
 		//EventEmitter.send('request', {
 			//'test': 'object'
 		//});
-		
-		
 		
 		document.addEventListener("DOMContentLoaded", function () {
 			ko.applyBindings(new Screen(), document.getElementById('app'));

@@ -21,9 +21,11 @@
   "homepage": "https://github.com/afterlogic/ini-mover#readme",
   "dependencies": {
     "conf-cfg-ini": "*",
+    "electron-reload": "^1.2.2",
+    "jquery": "*",
     "knockout": "*",
-    "underscore": "*",
-    "knockout-dragdrop": "*"
+    "knockout-dragdrop": "*",
+    "underscore": "*"
   },
   "devDependencies": {
     "electron-packager": "^8.7.0",

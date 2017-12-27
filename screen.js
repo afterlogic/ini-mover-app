@@ -7,9 +7,27 @@ const BrowserWindow = oElectron.remote.BrowserWindow;
 function Screen () {
 	
 	this.oGrid = ko.observable(null);
+	this.modules = ko.observableArray([]);
+	this.sourceFolder = ko.observable('');
+	this.currentModule = ko.observable('');
 	
+/*	
+	this.oGrid.subscribe(function (newValue) {
+		if (newValue !== null)
+		{
+			_.defer(function(){
+				$('#dataTbl').fixedTblHdrLftCol({
+				  scroll: {
+					height: '100%',
+					width: '100%'
+				  }
+				});
+			});			
+		}
+	});
+*/
 	this.ipc = oElectron.ipcRenderer;
-	this.sSourceFolder = '';
+	this.sI18NPath = '';
 	
 	this.init();
 }
@@ -20,14 +38,32 @@ Screen.prototype.init = function ()
 	
 	this.ipc.on('selected-directory', function (event, path) {
 		
-		this.sSourceFolder = path[0];
+		self.sourceFolder(path[0]);
 		EventEmitter.send('project-open', {
 			'folder': path[0]
 		});
 	});
 	
 	EventEmitter.on('project-open', function(event, oData) {
+		self.modules(JSON.parse(oData));
+	});
+	
+	EventEmitter.on('i18n-open', function(event, oData) {
 		self.fill(JSON.parse(oData));
+	});
+	
+};
+
+Screen.prototype.getI18N = function (sModule)
+{
+	var path = this.sourceFolder() + '/' + sModule + '/i18n/';
+	if (this.oGrid() !== null)
+	{
+		this.oGrid().clearRows();
+	}
+	this.currentModule(sModule);
+	EventEmitter.send('i18n-open', {
+		'folder': path
 	});
 };
 
@@ -48,8 +84,6 @@ Screen.prototype.fill = function (oData)
 
 Screen.prototype.openProject = function ()
 {
-	console.log('openProject');
-	
 	this.ipc.send('open-file-dialog');
 };
 
@@ -122,4 +156,9 @@ Screen.prototype.removeColumn = function ()
 	win.loadURL(modalPath);
 	win.show();
 	
+};
+
+Screen.prototype.isCurrentModule = function (sModule)
+{
+	return !!(this.currentModule() === sModule);
 };

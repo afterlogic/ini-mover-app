@@ -165,6 +165,7 @@ Grid.prototype.addColumn = function (sColumnName, sSourceColumnName) {
 	}
 };
 
+
 Grid.prototype.removeColumn = function (sColumnName) {
 
 	if (sColumnName)
@@ -196,6 +197,11 @@ Grid.prototype.reorder = function (event, dragData, zoneData) {
 		zoneData.items.remove(dragData);
 		zoneData.items.splice(zoneDataIndex, 0, dragData);
 	}
+};
+
+Grid.prototype.clearRows = function () {
+	this.headers([]);
+	this.rows([]);
 };
 
 
