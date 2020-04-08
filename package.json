@@ -21,6 +21,7 @@
   "homepage": "https://github.com/afterlogic/ini-mover#readme",
   "dependencies": {
     "conf-cfg-ini": "*",
+    "electron": "^3.0.10",
     "electron-reload": "^1.2.2",
     "jquery": "*",
     "knockout": "*",

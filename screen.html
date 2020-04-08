@@ -19,6 +19,15 @@
 		table {
 			width: auto;
 		}
+		thead th:first-child {
+			left: 0;
+			z-index: 1;
+		}		
+		.tableFixHead thead th { 
+			position: sticky; 
+			top: 0; 
+			background: #f0f0f0;
+		}
 		.table-striped {
 			table-layout: fixed;
 		}
@@ -103,7 +112,7 @@
 			</div>
 		</header>
 		
-		<div class="window-content">
+		<div class="window-content tableFixHead">
 			<div style="overflow: auto;">
 				<table class="table-striped sortable">
 					<thead>
@@ -120,7 +129,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="window-content">
+			<div class="window-content tableFixHead">
 				<!-- ko with: oGrid -->
 				<table class="table-striped sortable" id="dataTbl" data-bind="dropZone: {name: 'sortable', drop: function () {}}">
 					<thead>

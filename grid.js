@@ -60,7 +60,7 @@ Grid.prototype.getHeaders = function ()
 			aHeaders = _.union(aHeaders, _.keys(oRowData));
 		});
 	}
-
+	
 	return aHeaders;
 };
 

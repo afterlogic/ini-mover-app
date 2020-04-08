@@ -206,21 +206,18 @@ function prepareData (oFilesContent) {
 	
 	_.each(oFilesContent, function (oFile, sFileName) {
 	
-		// _.each(oFile, function (oSection, sSectionName) {
-		
-			_.each(oFile, function (sConst, sConstName) {
-				var 
-					sFullConstName = sConstName
-				;
+		_.each(oFile, function (sConst, sConstName) {
+			var 
+				sFullConstName = sConstName
+			;
+			
+			if (!oData.rows[sFullConstName])
+			{
+				oData.rows[sFullConstName] = {};
+			}
 				
-				if (!oData.rows[sFullConstName])
-				{
-					oData.rows[sFullConstName] = {};
-				}
-					
-				oData.rows[sFullConstName][sFileName] = sConst;
-			});
-		// });
+			oData.rows[sFullConstName][sFileName] = sConst;
+		});
 	});
 	
 	return oData;
@@ -247,7 +244,6 @@ EventEmitter.on('i18n-open', function(event, oRequest) {
 		oFilesData = getData(oRequest['folder'])
 		event.sender.send('i18n-open', JSON.stringify(oFilesData));
 	}
-	
 });
 
 EventEmitter.on('project-save', function(event, oRequest) {
@@ -268,6 +264,7 @@ EventEmitter.on('open-file-dialog', function (event) {
 	}, function (files) {
 		if (files) {
 			event.sender.send('selected-directory', files);
+			console.log(files);
 		}
 	});
 });
